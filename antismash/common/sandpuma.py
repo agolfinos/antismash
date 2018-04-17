@@ -147,7 +147,7 @@ def getscore(scaleto, nd, dist2q, leaf, o) -> float:
     return score    
 
 
-def deeperdive(query: int, tree: Phylo.Tree, nearest1: int, nearest2: int, l: Dict[int, str, Any])-> str, str, str:
+def deeperdive(query: int, tree: Phylo.Tree, nearest1: int, nearest2: int, l: Dict[int, str, Any])-> [str, str, str]:
     """ deeper substrate prediction triggered for non-monophyletic seqs
     Arguments:
         query: index for the query
@@ -185,7 +185,7 @@ def deeperdive(query: int, tree: Phylo.Tree, nearest1: int, nearest2: int, l: Di
             return ('no_confident_result', 'NA', 'no_confident_result') 
 
 
-def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.Tree, l: Dict[int, str, Any])-> str, str:
+def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.Tree, l: Dict[int, str, Any])-> [str, str]:
     """ recursive substrate prediction for a query & it's sisters in a tree
     Arguments:
         query: index for the query
