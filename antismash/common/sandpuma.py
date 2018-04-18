@@ -117,14 +117,14 @@ def get_child_leaves(tree, parent) -> List:
     child_leaves = []
     for leaf in tree.get_terminals():
         for node in tree.get_path(leaf):
-            if(node == parent):
+            if node == parent:
                 child_leaves.append(leaf)
     return child_leaves
 
 
 def calcscore(scaleto, distance) -> float:
     ''' Scale distance to score from 0 to 1 '''
-    if(distance >= scaleto):
+    if distance >= scaleto:
         return 0
     else:
         return float(scaleto - distance) / scaleto
@@ -136,9 +136,9 @@ def getscore(scaleto, nd, dist2q, leaf, o) -> float:
     nnspec = leaf[o[0]]['spec']
     for n in o:
         curspec = leaf[o[0]]['spec']
-        if(nnspec == curspec):
+        if nnspec == curspec:
             tmpscore = calcscore(scaleto, float(dist2q[n]) / nd)
-            if(tmpscore > 0):
+            if tmpscore > 0:
                 score += tmpscore
             else:
                 break
@@ -147,7 +147,7 @@ def getscore(scaleto, nd, dist2q, leaf, o) -> float:
     return score    
 
 
-def deeperdive(query: int, tree: Phylo.Tree, nearest1: int, nearest2: int, l: Dict[int, str, Any])-> str, str, str:
+def deeperdive(query: int, tree: Phylo.Tree, nearest1: int, nearest2: int, l: Dict[int, str, Any])-> [str, str, str]:
     """ deeper substrate prediction triggered for non-monophyletic seqs
     Arguments:
         query: index for the query
@@ -179,13 +179,13 @@ def deeperdive(query: int, tree: Phylo.Tree, nearest1: int, nearest2: int, l: Di
             sisterdist[sister.name]['node'] = sister
             ordered_sisterdist = sorted(sisterdist, key=sisterdist.get)
             for name in ordered_sisterdist:
-                if(name != l[query]['id']):
+                if name != l[query]['id']:
                     forced = re.split("_+", name)
                     return ('no_confident_result', 'NA', forced[-1])
             return ('no_confident_result', 'NA', 'no_confident_result') 
 
 
-def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.Tree, l: Dict[int, str, Any])-> str, str:
+def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.Tree, l: Dict[int, str, Any])-> [str, str]:
     """ recursive substrate prediction for a query & it's sisters in a tree
     Arguments:
         query: index for the query
@@ -200,9 +200,9 @@ def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.Tree, l: Dict[
         substrate specificity (str), hit name (str)
     """
     if((lo in l) and (hi in l)): ## Not first or last
-        if(l[lo]['spec'] == wc): ## lower bound is wildcard
+        if l[lo]['spec'] == wc: ## lower bound is wildcard
             checkclade(query, lo-1, hi, wc, l)
-        elif(l[hi]['spec'] == wc): ## upper bound is wildcard
+        elif l[hi]['spec'] == wc: ## upper bound is wildcard
             checkclade(query, lo, hi+1, wc, l)
         else:
             ## Get the lca's descendants and check specs
@@ -212,7 +212,7 @@ def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.Tree, l: Dict[
             passflag = 1
             for child in get_child_leaves(tree, lca):
                 split_id = re.split("_+", child.name)
-                if(spec != ''): ## Not yet assigned
+                if spec != '': ## Not yet assigned
                     if((split_id[-1] != spec) and (split_id[-1] != wc)): ## Specs are different, Requires a deeper dive
                         passflag = 0
                     else:
@@ -221,12 +221,12 @@ def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.Tree, l: Dict[
                 else:
                     spec = split_id[-1]
                     iname = split_id[0]
-            if(passflag == 0):
+            if passflag == 0:
                 return('deeperdive', 'NA')
             else:
                 return(spec, iname)
     else: ## First or last
-        return('deeperdive', 'NA')        
+        return 'deeperdive', 'NA'        
 
 
 def predicat(pplacer_tree: str, masscutoff: float, wild: str, snn_thresh: float)-> PredicatResults:
@@ -264,18 +264,18 @@ def predicat(pplacer_tree: str, masscutoff: float, wild: str, snn_thresh: float)
     group = 1 ## group number
     leafnum = 1 ## leaf number
     for leaf in tree.get_terminals():
-        if(bool(re.search('^'+nppref[0], leaf.name))): ## if node is nppref[0], store the node
+        if bool(re.search('^'+nppref[0], leaf.name)): ## if node is nppref[0], store the node
             npnode[0] = leaf
-        elif(bool(re.search('^'+nppref[1], leaf.name))): ## if node is nppref[1], store the node
+        elif bool(re.search('^'+nppref[1], leaf.name)): ## if node is nppref[1], store the node
             npnode[1] = leaf
         split_id = re.split("_+", leaf.name) ## Split ID on _, split_id[-1] will be specificity
-        if(last != ''): ## Every pass except the first
+        if last != '': ## Every pass except the first
             if((last != split_id[-1]) or (last != wild)): ## begin new group
                 group += 1
         if re.match("^#0$", split_id[-2]) is not None: ## matches pplacer query formatting; #0 is the top placement
             last = wild
             mass = float(re.sub(r"^.+#\d+_M=(\d+?\.?\d*)$", "\g<1>", leaf.name))
-            if(mass < masscutoff):
+            if mass < masscutoff:
                 return PredicatResults('no_confident_result', 'no_confident_result', 0, 0, 0)
         else:
             last = split_id[-1]
@@ -285,7 +285,7 @@ def predicat(pplacer_tree: str, masscutoff: float, wild: str, snn_thresh: float)
         leaves[leafnum]['spec'] = last
         leaves[leafnum]['node'] = leaf
         ## Record queries
-        if(last == wild):
+        if last == wild:
             query.append(leafnum)
         leafnum += 1 
     qnum = next(iter(query))
@@ -299,23 +299,23 @@ def predicat(pplacer_tree: str, masscutoff: float, wild: str, snn_thresh: float)
     ## Get zero distances
     zero_dist = []
     for leafnum in ordered_dist:
-        if(distfromquery[leafnum] <= zero_thresh):
-            if(distfromquery[leafnum] >= 0):
+        if distfromquery[leafnum] <= zero_thresh:
+            if distfromquery[leafnum] >= 0:
                 zero_dist.append(leafnum)
             else:
                 break
     forcedpred = 'no_force_needed'
     pred = 'no_call'
     hit = 'NA'
-    if(len(zero_dist) > 0): ## query has zero length known neighbors
+    if len(zero_dist) > 0: ## query has zero length known neighbors
         pred = leaves[zero_dist[0]]['spec']
         hit = re.search("^(\S+)_.+$", leaves[zero_dist[0]]['id']).groups()[0]
     else:
         ## predict the clade
         pred, hit = checkclade(qnum, qnum-1, qnum+1, wild, tree, leaves)
-        if(pred == 'deeperdive'):
+        if pred == 'deeperdive':
             pred, hit, forcedpred = deeperdive(qnum, tree, ordered_dist[0], ordered_dist[1], leaves)
-            if(hit != 'NA'):
+            if hit != 'NA':
                 hit = re.search("^(\S+)_.+$", hit).groups()[0]
     if forcedpred == 'no_force_needed':
         forcedpred = pred
@@ -323,10 +323,10 @@ def predicat(pplacer_tree: str, masscutoff: float, wild: str, snn_thresh: float)
     nn_dist = float(distfromq[ordered_dist[0]]) / normdist
     nnscore = 0
     snnscore = 0
-    if(nn_dist < dcut):
+    if nn_dist < dcut:
         snnscore = getscore(dcut, normdist, distfromquery, leaves, ordered_dist)
         nnscore = calcscore(dcut, nn_dist)
-    if(snnscore < snn_thresh):
+    if snnscore < snn_thresh:
         forcedpred = 'no_confident_result'
     return PredicatResults(pred, forcedpred, nn_dist, nnscore, snnscore)
 
@@ -341,7 +341,8 @@ def run_predicat(reference_aln: str, queryfa: Dict[str, str], wildcard: str, ref
         ref_pkg: pplacer reference package
         masscutoff: cutoff value for pplacer masses
 
-    Returns:                                                                                                                            PredicatResults
+    Returns: 
+        PredicatResults
             monophyly -> substrate specificity (str)
             forced -> substrate specificity (str)
             nndist -> distance to nearest neighbor (float)
@@ -388,11 +389,11 @@ def run_asm(queryfa: Dict[str, str], stachfa: Dict[str, str], seedfa: Dict[str, 
     pos = 0
     newcode = []
     for p, val in enumerate(aligned2seed['phe_grsA']):
-        if(val=='-'):
+        if val=='-':
             continue
         else:
             pos += 1
-            if(pos in grsAcode):
+            if pos in grsAcode:
                 newcode.append(p)
     ## Extract codes
     extractedcode = {}
@@ -402,13 +403,13 @@ def run_asm(queryfa: Dict[str, str], stachfa: Dict[str, str], seedfa: Dict[str, 
             code = code + aligned2seq[seqname][n]
             extractedcode[seqname] = code
     ## Error checking
-    truth = {'phe_grsA':'DAWTIAAIC', 'asp_stfA-B2':'DLTKVGHIG','orn_grsB3':'DVGEIGSID','val_cssA9':'DAWMFAAVL'}
+    truth = {'phe_grsA':'DAWTIAAIC', 'asp_stfA-B2':'DLTKVGHIG', 'orn_grsB3':'DVGEIGSID', 'val_cssA9':'DAWMFAAVL'}
     for seqname in extractedcode:
         if seqname == qname:
             continue
         else:
             if extractedcode[seqname] != truth[seqname]:
-                return('no_call') ## Issue with the alignment
+                return 'no_call' ## Issue with the alignment
     ## Score each
     scores = {}
     for sname in stachfa:
@@ -429,13 +430,13 @@ def run_asm(queryfa: Dict[str, str], stachfa: Dict[str, str], seedfa: Dict[str, 
             for s in spec:
                 scores[str(match)][s] = 1
     if '9' in scores:
-        return('|'.join(sorted(scores['9'])))
+        return '|'.join(sorted(scores['9']))
     elif '8' in scores:
-        return('|'.join(sorted(scores['8'])))
+        return '|'.join(sorted(scores['8']))
     elif '7' in scores:
-        return('|'.join(sorted(scores['7'])))
+        return '|'.join(sorted(scores['7']))
     else:
-        return('no_call')
+        return 'no_call'
 
 
 def run_svm(queryfa: Dict[str, str]) -> str:
@@ -603,7 +604,7 @@ def split_into_groups(fasta: Dict[str, str], n_groups: int) -> Dict[str, List[st
     return groups
 
 
-def run_sandpuma(name2seq: Dict[str, str], threads: int, knownfaa: str, wildcard: str, snn_thresh: float, knownasm: str, max_depth: int, min_leaf_sup: int, jackknife_data: str, ref_aln: str, ref_tree: str, ref_pkg: str, masscutoff:float, stach_file: str, seed_file: str):
+def run_sandpuma(name2seq: Dict[str, str], threads: int, knownfaa: str, wildcard: str, snn_thresh: float, knownasm: str, max_depth: int, min_leaf_sup: int, jackknife_data: str, ref_aln: str, ref_tree: str, ref_pkg: str, masscutoff: float, stach_file: str, seed_file: str):
     """ SANDPUMA parallelized pipleline
     Arguments:
         name2seq: dictionary of seq names (str) to seqs (str)
@@ -636,7 +637,7 @@ def run_sandpuma(name2seq: Dict[str, str], threads: int, knownfaa: str, wildcard
             jk[l[10]] = {'true': l[4],
                          'pid': l[3],
                          'shuf': l[0],
-                         'jk': = l[1],
+                         'jk': l[1],
                          'query': l[2],
                          'bin': l[11]}
             called_spec = l[5]
@@ -664,7 +665,7 @@ def run_sandpuma(name2seq: Dict[str, str], threads: int, knownfaa: str, wildcard
             else:
                 jk[uname]['method'][m] = 'no_call'
         labels.append( allspec[jk[uname]['true']] )
-        feature_matrix = [ jk[uname]['pid'] ]
+        feature_matrix = [jk[uname]['pid']]
         for m in allmethods:
             feature_matrix.extend(get_feature_matrix(jk[uname]['method'][m], i2s))
         features.append(feature_matrix)
@@ -690,7 +691,7 @@ def run_sandpuma(name2seq: Dict[str, str], threads: int, knownfaa: str, wildcard
         if nodemap[n]['decision'] == 'LEAF_NODE':
             p = nodemap[n]['parent']
             traceback = nodemap[p]['decision']+'%'+node[p]['thresh']+'-'+node[n]['parent_call']+'&LEAF_NODE-'+n
-            while(p != 0):
+            while p != 0:
                 n = p
                 p = node[p]['parent']
                 t = node[p]['decision']+'%'+node[p]['thresh']+'-'+node[n]['parent_call']
