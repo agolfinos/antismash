@@ -146,11 +146,7 @@ def getscore(scaleto, nd, dist2q, leaf, o) -> float:
     return score    
 
 
-<<<<<<< HEAD:antismash/common/sandpuma.py
-def deeperdive(query: int, tree: Phylo.Tree, nearest1: int, nearest2: int, l: Dict[int, str, Any])-> [str, str, str]:
-=======
 def deeperdive(query: int, tree: Phylo.BaseTree, nearest1: int, nearest2: int, l: Dict[int, Dict[str, Any]])-> [str, str, str]:
->>>>>>> 181e1f5346ec18dde02d3ebad580b80a139a4f9f:antismash/modules/sandpuma/sandpuma.py
     """ deeper substrate prediction triggered for non-monophyletic seqs
     Arguments:
         query: index for the query
@@ -188,11 +184,7 @@ def deeperdive(query: int, tree: Phylo.BaseTree, nearest1: int, nearest2: int, l
             return (['no_confident_result', 'NA', 'no_confident_result']) 
 
 
-<<<<<<< HEAD:antismash/common/sandpuma.py
-def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.Tree, l: Dict[int, str, Any])-> [str, str]:
-=======
 def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.BaseTree, l: Dict[int, Dict[str, Any]])-> [str, str]:
->>>>>>> 181e1f5346ec18dde02d3ebad580b80a139a4f9f:antismash/modules/sandpuma/sandpuma.py
     """ recursive substrate prediction for a query & it's sisters in a tree
     Arguments:
         query: index for the query
@@ -220,7 +212,7 @@ def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.BaseTree, l: D
             for child in get_child_leaves(tree, lca):
                 split_id = re.split("_+", child.name)
                 if spec != '': ## Not yet assigned
-                    if((split_id[-1] != spec) and (split_id[-1] != wc)): ## Specs are different, Requires a deeper dive
+                    if (split_id[-1] != spec) and (split_id[-1] != wc): ## Specs are different, Requires a deeper dive
                         passflag = 0
                     else:
                         spec = split_id[-1]
@@ -228,21 +220,12 @@ def checkclade(query: int, lo: int, hi: int, wc: str, tree: Phylo.BaseTree, l: D
                 else:
                     spec = split_id[-1]
                     iname = split_id[0]
-<<<<<<< HEAD:antismash/common/sandpuma.py
             if passflag == 0:
-                return('deeperdive', 'NA')
-=======
-            if(passflag == 0):
-                return(['deeperdive', 'NA'])
->>>>>>> 181e1f5346ec18dde02d3ebad580b80a139a4f9f:antismash/modules/sandpuma/sandpuma.py
+                return ['deeperdive', 'NA']
             else:
                 return([spec, iname])
     else: ## First or last
-<<<<<<< HEAD:antismash/common/sandpuma.py
-        return 'deeperdive', 'NA'        
-=======
         return(['deeperdive', 'NA'])        
->>>>>>> 181e1f5346ec18dde02d3ebad580b80a139a4f9f:antismash/modules/sandpuma/sandpuma.py
 
 
 def predicat(tree: Phylo.BaseTree, masscutoff: float, wild: str, snn_thresh: float)-> PredicatResults:
@@ -634,11 +617,7 @@ def split_into_groups(fasta: Dict[str, str], n_groups: int) -> Dict[str, List[st
     return groups
 
 
-<<<<<<< HEAD:antismash/common/sandpuma.py
-def run_sandpuma(name2seq: Dict[str, str], threads: int, knownfaa: str, wildcard: str, snn_thresh: float, knownasm: str, max_depth: int, min_leaf_sup: int, jackknife_data: str, ref_aln: str, ref_tree: str, ref_pkg: str, masscutoff: float, stach_file: str, seed_file: str):
-=======
-def run_sandpuma(name2seq: Dict[str, str], threads: int, knownfaa: str, wildcard: str, snn_thresh: float, knownasm: str, max_depth: int, min_leaf_sup: int, jackknife_data: str, ref_aln: str, ref_tree: str, ref_pkg: str, masscutoff:float, seed_file: str, nodemap_file: str, traceback_file: str, nrpsdir: str, phmmdb: str, piddb: str):
->>>>>>> 181e1f5346ec18dde02d3ebad580b80a139a4f9f:antismash/modules/sandpuma/sandpuma.py
+def run_sandpuma(name2seq: Dict[str, str], threads: int, knownfaa: str, wildcard: str, snn_thresh: float, knownasm: str, max_depth: int, min_leaf_sup: int, jackknife_data: str, ref_aln: str, ref_tree: str, ref_pkg: str, masscutoff: float, seed_file: str, nodemap_file: str, traceback_file: str, nrpsdir: str, phmmdb: str, piddb: str):
     """ SANDPUMA parallelized pipleline
     Arguments:
         name2seq: dictionary of seq names (str) to seqs (str)
@@ -729,13 +708,8 @@ def run_sandpuma(name2seq: Dict[str, str], threads: int, knownfaa: str, wildcard
     for n in nodemap:
         if nodemap[n]['decision'] == 'LEAF_NODE':
             p = nodemap[n]['parent']
-<<<<<<< HEAD:antismash/common/sandpuma.py
-            traceback = nodemap[p]['decision']+'%'+node[p]['thresh']+'-'+node[n]['parent_call']+'&LEAF_NODE-'+n
-            while p != 0:
-=======
             traceback = nodemap[p]['decision']+'%'+str(nodemap[p]['thresh'])+'-'+nodemap[n]['parent_call']+'&LEAF_NODE-'+str(n)
             while(p != 0):
->>>>>>> 181e1f5346ec18dde02d3ebad580b80a139a4f9f:antismash/modules/sandpuma/sandpuma.py
                 n = p
                 p = nodemap[p]['parent']
                 t = nodemap[p]['decision']+'%'+str(nodemap[p]['thresh'])+'-'+nodemap[n]['parent_call']
